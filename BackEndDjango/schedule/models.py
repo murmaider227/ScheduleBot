@@ -27,13 +27,14 @@ class Week(models.Model):
     year = models.ForeignKey(Year, on_delete=models.CASCADE, verbose_name='Курс', null=True)
     day = models.ForeignKey(Day, on_delete=models.CASCADE)
     option = models.ForeignKey(Option, on_delete=models.CASCADE, verbose_name='Вариант', null=True)
-    subject = models.ForeignKey('Subject', on_delete=models.CASCADE, related_name='subject1', null=True, verbose_name='Первый предмет', blank=True)
-
-    subject2 = models.ForeignKey('Subject', on_delete=models.CASCADE, related_name='subject2', null=True, verbose_name='Второй предмет', blank=True)
-
-    subject3 = models.ForeignKey('Subject', on_delete=models.CASCADE, related_name='subject3', null=True, verbose_name='Третий предмет', blank=True)
-
-    subject4 = models.ForeignKey('Subject', on_delete=models.CASCADE, related_name='subject4', null=True, verbose_name='Четвертый предмет', blank=True)
+    subject1_name = models.CharField(max_length=40, blank=True)
+    subject1_teacher = models.CharField(max_length=40, blank=True)
+    subject2_name = models.CharField(max_length=40, blank=True)
+    subject2_teacher = models.CharField(max_length=40, blank=True)
+    subject3_name = models.CharField(max_length=40, blank=True)
+    subject3_teacher = models.CharField(max_length=40, blank=True)
+    subject4_name = models.CharField(max_length=40, blank=True)
+    subject4_teacher = models.CharField(max_length=40, blank=True)
 
     def __str__(self):
         return str(self.major) + ' | ' + str(self.year) + ' | ' + str(self.day)
@@ -60,10 +61,4 @@ class Major(models.Model):
         return self.name
 
 
-class Subject(models.Model):
-    name = models.CharField(max_length=40)
-    teacher = models.CharField(max_length=40)
-
-    def __str__(self):
-        return self.name + ' | ' + self.teacher
 
