@@ -29,12 +29,16 @@ class Week(models.Model):
     option = models.ForeignKey(Option, on_delete=models.CASCADE, verbose_name='Вариант', null=True)
     subject1_name = models.CharField(max_length=40, blank=True, verbose_name='Первый предмет')
     subject1_teacher = models.CharField(max_length=40, blank=True, verbose_name='Преподаватель')
+    subject1_place = models.CharField(max_length=40, blank=True, verbose_name='Кабинет')
     subject2_name = models.CharField(max_length=40, blank=True, verbose_name='Второй предмет')
     subject2_teacher = models.CharField(max_length=40, blank=True, verbose_name='Преподаватель')
+    subject2_place = models.CharField(max_length=40, blank=True, verbose_name='Кабинет')
     subject3_name = models.CharField(max_length=40, blank=True, verbose_name='Третий предмет')
     subject3_teacher = models.CharField(max_length=40, blank=True, verbose_name='Преподаватель')
+    subject3_place = models.CharField(max_length=40, blank=True, verbose_name='Кабинет')
     subject4_name = models.CharField(max_length=40, blank=True, verbose_name='Четвертый предмет')
     subject4_teacher = models.CharField(max_length=40, blank=True, verbose_name='Преподаватель')
+    subject4_place = models.CharField(max_length=40, blank=True, verbose_name='Кабинет')
 
     def __str__(self):
         return str(self.major) + ' | ' + str(self.year) + ' | ' + str(self.day)
