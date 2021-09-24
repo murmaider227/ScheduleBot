@@ -8,7 +8,7 @@ def database(func):
         conn = psycopg2.connect(dbname=os.getenv('DB_NAME'), user=os.getenv('DB_USERNAME'), password=os.getenv('DB_PASSWORD'), host='localhost')
         cursor = conn.cursor()
 
-        return_value = func(cursor, *args)
+        return_value = func(*args, cursor=cursor)
 
         cursor.close()
         conn.close()
@@ -16,7 +16,7 @@ def database(func):
     return wrapper  
 
 @database
-def get_schedule(cursor, major, day):
+def get_schedule(major, day, cursor):
 
     sql='''SELECT sw.id, sm.name, sy.year, sd.name, so.option,
     subject1_name, subject1_teacher, subject1_place,
@@ -38,6 +38,15 @@ def create_user(telegram_id):
 
 @database
 def get_faculty(cursor):
-    cursor.execute('')
+    cursor.execute('SELECT name FROM schedule_faculty')
+    return cursor.fetchall()
+
+@database
+def get_major(faculty, cursor):
+    sql = '''SELECT sm.name 
+    FROM schedule_major sm 
+    JOIN schedule_faculty sf on sm.faculty_id = sf.id 
+    WHERE sf.name = %s'''
+    cursor.execute(sql, (faculty,))
     return cursor.fetchall()
 
