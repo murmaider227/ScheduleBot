@@ -1,4 +1,4 @@
-from db import get_schedule
+from app.db import get_schedule
 
 
 def print_schedule(major, day='Понеділок'):

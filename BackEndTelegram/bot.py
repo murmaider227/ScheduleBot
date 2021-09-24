@@ -4,9 +4,9 @@ import logging
 import os
 import asyncio
 
-from utils import print_schedule
-from handlers.common import register_handlers_common
-from handlers.schedule import register_handlers_schedule
+from app.utils import print_schedule
+from app.handlers.common import register_handlers_common
+from app.handlers.schedule import register_handlers_schedule
 
 logger = logging.getLogger(__name__)
 

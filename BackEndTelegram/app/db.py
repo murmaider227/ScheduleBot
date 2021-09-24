@@ -35,3 +35,9 @@ def get_schedule(cursor, major, day):
 
 def create_user(telegram_id):
     pass
+
+@database
+def get_faculty(cursor):
+    cursor.execute('')
+    return cursor.fetchall()
+

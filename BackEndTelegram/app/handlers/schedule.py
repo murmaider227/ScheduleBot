@@ -1,10 +1,10 @@
 from aiogram import types, Dispatcher
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from aiogram.utils.callback_data import CallbackData
 
 
-from utils import print_schedule
+from app.utils import print_schedule
+from app.keyboards import day_keyboard, callback_days
 
 
 class ChooseMajor(StatesGroup):
@@ -15,28 +15,7 @@ class ChooseMajor(StatesGroup):
     choose_option = State()
 
 
-callback_days = CallbackData("week","day")
-
-def day_keyboard():
-
-
-    row_2= types.InlineKeyboardButton('Настройка', callback_data='setting')
-
-    buttons = [
-            types.InlineKeyboardButton(text="Пн", callback_data=callback_days.new(day="Понеділок")),
-            types.InlineKeyboardButton(text="Вт", callback_data=callback_days.new(day="Вівторок")),
-            types.InlineKeyboardButton(text="Ср", callback_data=callback_days.new(day="Середа")),
-            types.InlineKeyboardButton(text="Чт", callback_data=callback_days.new(day="Четвер")),
-            types.InlineKeyboardButton(text="Пт", callback_data=callback_days.new(day="Пятниця")),
-            ]
-
-
-    keyboard = types.InlineKeyboardMarkup(row_width=5)
-    keyboard.add(*buttons)
-    keyboard.row(row_2)
-    
-    return keyboard 
-
+ 
 async def answer_for_choosen_major(query: types.CallbackQuery, state: FSMContext):
     #logging.info(f'{query.message.chat.username}: {query.data}')
     text = print_schedule(query.data)
