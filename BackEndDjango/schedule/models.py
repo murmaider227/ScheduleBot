@@ -43,11 +43,20 @@ class Week(models.Model):
     def __str__(self):
         return str(self.major) + ' | ' + str(self.year) + ' | ' + str(self.day)
 
+class Major(models.Model):
+    name = models.CharField(max_length=40)
+    faculty = models.ForeignKey('Faculty', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
 
 class Student(models.Model):
     username = models.CharField(max_length=60)
-    telegram_id = models.BigIntegerField()
-    major = models.ForeignKey('Major', on_delete=models.CASCADE)
+    telegram_id = models.BigIntegerField(primary_key=True, unique=True)
+    major = models.ManyToManyField('Week', blank=True)
+
+    def __str__(self):
+        return self.username
 
 
 class Faculty(models.Model):
@@ -57,12 +66,6 @@ class Faculty(models.Model):
         return self.name
 
 
-class Major(models.Model):
-    name = models.CharField(max_length=40)
-    faculty = models.ForeignKey(Faculty, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.name
 
 
 

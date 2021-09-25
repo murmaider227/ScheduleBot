@@ -1,5 +1,8 @@
-from app.db import get_schedule
+from app.db import get_schedule, get_group_id, save_group
 
+def save_user_group(user, major, year):
+    group_id = get_group_id(year, major)
+    save_group(user, group_id)
 
 def print_schedule(major, day='Понеділок'):
     text=get_schedule(major, day)
