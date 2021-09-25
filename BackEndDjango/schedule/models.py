@@ -8,13 +8,6 @@ class Day(models.Model):
         return self.name
 
 
-class Year(models.Model):
-    year = models.IntegerField()
-
-    def __str__(self):
-        return str(self.year)
-
-
 class Option(models.Model):
     option = models.IntegerField()
 
@@ -23,8 +16,7 @@ class Option(models.Model):
 
 
 class Week(models.Model):
-    major = models.ForeignKey('Major', on_delete=models.CASCADE, verbose_name='Специальность')
-    year = models.ForeignKey(Year, on_delete=models.CASCADE, verbose_name='Курс', null=True)
+    group = models.ForeignKey('Group', on_delete=models.CASCADE, null=True)
     day = models.ForeignKey(Day, on_delete=models.CASCADE)
     option = models.ForeignKey(Option, on_delete=models.CASCADE, verbose_name='Вариант', null=True)
     subject1_name = models.CharField(max_length=40, blank=True, verbose_name='Первый предмет')
@@ -41,7 +33,7 @@ class Week(models.Model):
     subject4_place = models.CharField(max_length=40, blank=True, verbose_name='Кабинет')
 
     def __str__(self):
-        return str(self.major) + ' | ' + str(self.year) + ' | ' + str(self.day)
+        return str(self.group) + ' | ' + str(self.day)
 
 class Major(models.Model):
     name = models.CharField(max_length=40)
@@ -53,7 +45,7 @@ class Major(models.Model):
 class Student(models.Model):
     username = models.CharField(max_length=60)
     telegram_id = models.BigIntegerField(primary_key=True, unique=True)
-    major = models.ManyToManyField('Week', blank=True)
+    major = models.ManyToManyField('Group', blank=True)
 
     def __str__(self):
         return self.username
@@ -65,7 +57,12 @@ class Faculty(models.Model):
     def __str__(self):
         return self.name
 
+class Group(models.Model):
+    major = models.ForeignKey(Major, on_delete=models.CASCADE)
+    year = models.IntegerField()
 
+    def __str__(self):
+        return str(self.major) + ' | ' + str(self.year)
 
 
 

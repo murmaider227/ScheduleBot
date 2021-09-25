@@ -39,11 +39,11 @@ async def choose_day(query: types.CallbackQuery, callback_data : dict, state: FS
     await query.message.edit_text(text=text,
                                 reply_markup=day_keyboard())
     await ChooseMajor.save_major.set()
-    await state.update_data(chosen_major=callback_data["major"], chosen_year=callback_data["year"])
+    await state.update_data(chosen_major=callback_data["major"])
 
 async def answer_for_choosen_day(query: types.CallbackQuery, callback_data : dict, state: FSMContext):
     user_data = await state.get_data()
-    text = print_schedule(user_data['chosen_major'], user_data["chosen_year"], callback_data["day"])
+    text = print_schedule(user_data['chosen_major'], callback_data["day"])
     with suppress(MessageNotModified):
         await query.message.edit_text(text=text,
                                 reply_markup=day_keyboard())

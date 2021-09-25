@@ -17,7 +17,7 @@ def database(func):
     return wrapper  
 
 @database
-def get_schedule(major, day, cursor):
+def get_schedule(major, year, day, cursor):
 
     sql='''SELECT sw.id, sm.name, sy.year, sd.name, so.option,
     subject1_name, subject1_teacher, subject1_place,
@@ -30,7 +30,18 @@ def get_schedule(major, day, cursor):
     JOIN schedule_day sd on sw.day_id = sd.id 
     JOIN schedule_option so on sw.option_id = so.id
     WHERE sm.name=%s AND sd.name=%s'''
-    cursor.execute(sql, (major,day))
+    sql='''SELECT sw.id, sm.name, sg.year, sd.name, so.option,
+    subject1_name, subject1_teacher, subject1_place,
+    subject2_name, subject2_teacher, subject2_place,
+    subject3_name, subject3_teacher, subject3_place,
+    subject4_name, subject4_teacher, subject4_place
+    FROM schedule_week sw
+    JOIN schedule_group sg on sw.group_id=sg.id
+    JOIN schedule_major sm on sg.major_id=sm.id
+    JOIN schedule_day sd on sw.day_id = sd.id 
+    JOIN schedule_option so on sw.option_id = so.id
+    WHERE sm.name=%s AND sd.name=%s AND sg.year=%s'''
+    cursor.execute(sql, (major,day,year))
     text = cursor.fetchall()
     return text[0]
 
@@ -58,11 +69,27 @@ def get_group_id(year, major, cursor):
     JOIN schedule_year sy on sw.year_id = sy.id
     JOIN schedule_major sm on sw.major_id=sm.id
     WHERE sy.year=%s AND sm.name=%s
+    ''' 
+    sql = '''
+    SELECT sg.id FROM schedule_group sg
+    JOIN schedule_major sm on sg.major_id=sm.id
+    WHERE sg.year=%s AND sm.name=%s
     '''
     cursor.execute(sql, (year, major))
     return cursor.fetchall()[0]
 
 @database
 def save_group(user, group, cursor):
-    sql = '''INSERT INTO schedule_student_major(student_id, week_id) VALUES(%s, %s)'''
+    sql = '''INSERT INTO schedule_student_major(student_id, group_id) VALUES(%s, %s)'''
     cursor.execute(sql, (user, group))
+
+@database
+def get_user_group(user, cursor):
+    sql = '''
+    SELECT sm.name, sg.year FROM schedule_group sg
+    JOIN schedule_major sm on sg.major_id=sm.id
+    JOIN schedule_student_major ssm on sg.id = ssm.group_id
+    WHERE ssm.student_id = %s
+    '''
+    cursor.execute(sql, (user,))
+    return cursor.fetchall()

@@ -1,15 +1,16 @@
 from aiogram import types
 from aiogram.utils.callback_data import CallbackData
-from app.db import get_faculty, get_major
+from app.db import get_faculty, get_major, get_user_group
 
-callback_groups = CallbackData("group", "user", "action")
+callback_groups = CallbackData("group", "major", "year")
 
-def group_keyboard():
-    buttons=(
-            types.InlineKeyboardButton(text="Додати групу", callback_data="add group"),
-            )
+def group_keyboard(user):
+    groups = get_user_group(user)
+    buttons = (types.InlineKeyboardButton(text=str(item[0]) + str(item[1]), callback_data=callback_groups.new(major=item[0], year=item[1])) for item in groups)   
+    add = types.InlineKeyboardButton(text="Додати групу", callback_data="add group")
     keyboard = types.InlineKeyboardMarkup()
     keyboard.add(*buttons)
+    keyboard.row(add)
     return keyboard
 
 callback_days = CallbackData("week","day")
