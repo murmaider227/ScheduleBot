@@ -7,12 +7,11 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.utils.exceptions import MessageNotModified
 
 from app.utils import print_schedule, save_user_group
-from app.keyboards import faculty_keyboard, day_keyboard, callback_days, major_keyboard, callback_facultys, callback_majors, group_keyboard, callback_groups, year_keyboard, callback_years
-
+from app.keyboards import * 
 
 class ChooseMajor(StatesGroup):
-    save_group = State()
-    save_major = State()
+    save_group = State() # для сохранения групы
+    save_major = State() # для сохранения специальности при выборе другого дня
 
 
 async def choose_group(message: types.Message):
@@ -30,6 +29,7 @@ async def choose_year(query: types.CallbackQuery, callback_data: dict, state:FSM
     await query.message.edit_text(text='Вибери рык', reply_markup=year_keyboard())
 
 async def user_save_group(query: types.CallbackQuery, callback_data: dict, state: FSMContext):
+    ''' Сохранение групы в бд '''
     user_data = await state.get_data()
     save_user_group(query.from_user.id, user_data['chosen_major'], callback_data["year"])
     await query.message.edit_text('Успешно')

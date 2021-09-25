@@ -12,10 +12,5 @@ async def start_cmd(message: types.Message ):
     await message.answer("Hi", reply_markup=keyboard)
 
 
-async def choose_faculty(message: types.Message):
-    await message.answer("Выберите факультет", reply_markup=faculty_keyboard())
-
-
-
 def register_handlers_common(dp: Dispatcher):
         dp.register_message_handler(start_cmd, commands="start", state="*")
