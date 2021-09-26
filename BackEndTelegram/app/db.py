@@ -90,10 +90,21 @@ def get_user_group(user, cursor):
     Получение списка груп пользователя
     '''
     sql = '''
-    SELECT sm.name, sg.year FROM schedule_group sg
+    SELECT sm.name, sg.year, sg.id FROM schedule_group sg
     JOIN schedule_major sm on sg.major_id=sm.id
     JOIN schedule_student_major ssm on sg.id = ssm.group_id
     WHERE ssm.student_id = %s
     '''
     cursor.execute(sql, (user,))
     return cursor.fetchall()
+
+@database
+def delete_user_from_group(user, group, cursor):
+    '''
+    Для удаления групы у пользователя
+    '''
+    sql = '''
+    DELETE FROM schedule_student_major
+    WHERE student_id = %s AND group_id = %s
+    '''
+    cursor.execute(sql, (user, group))

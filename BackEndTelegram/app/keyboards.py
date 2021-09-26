@@ -2,11 +2,11 @@ from aiogram import types
 from aiogram.utils.callback_data import CallbackData
 from app.db import get_faculty, get_major, get_user_group
 
-callback_groups = CallbackData("group", "major", "year")
+callback_groups = CallbackData("group", "major", "year", "id")
 
 def group_keyboard(user):
     groups = get_user_group(user)
-    buttons = (types.InlineKeyboardButton(text=str(item[0]) + str(item[1]), callback_data=callback_groups.new(major=item[0], year=item[1])) for item in groups)   
+    buttons = (types.InlineKeyboardButton(text=str(item[0]) + str(item[1]), callback_data=callback_groups.new(major=item[0], year=item[1], id=item[2])) for item in groups)   
     add = types.InlineKeyboardButton(text="Додати групу", callback_data="add group")
     keyboard = types.InlineKeyboardMarkup()
     keyboard.add(*buttons)
@@ -17,8 +17,8 @@ callback_days = CallbackData("week","day")
 
 def day_keyboard():
 
-
-    row_2= types.InlineKeyboardButton('Настройка', callback_data='setting')
+    row_2=types.InlineKeyboardButton('Видалити групу', callback_data='delete')
+    row_3= types.InlineKeyboardButton('Настройка', callback_data='setting')
 
     buttons = [
             types.InlineKeyboardButton(text="Пн", callback_data=callback_days.new(day="Понеділок")),
@@ -32,6 +32,7 @@ def day_keyboard():
     keyboard = types.InlineKeyboardMarkup(row_width=5)
     keyboard.add(*buttons)
     keyboard.row(row_2)
+    keyboard.row(row_3)
     
     return keyboard
 

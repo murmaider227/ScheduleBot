@@ -8,6 +8,8 @@ from aiogram.utils.exceptions import MessageNotModified
 
 from app.utils import print_schedule, save_user_group
 from app.keyboards import * 
+from app.db import delete_user_from_group
+
 
 class ChooseMajor(StatesGroup):
     save_group = State() # для сохранения групы
@@ -39,7 +41,7 @@ async def choose_day(query: types.CallbackQuery, callback_data : dict, state: FS
     await query.message.edit_text(text=text,
                                 reply_markup=day_keyboard())
     await ChooseMajor.save_major.set()
-    await state.update_data(chosen_major=callback_data["major"], chosen_year=callback_data["year"])
+    await state.update_data(chosen_major=callback_data["major"], chosen_year=callback_data["year"], chosen_group=callback_data["id"])
 
 async def answer_for_choosen_day(query: types.CallbackQuery, callback_data : dict, state: FSMContext):
     user_data = await state.get_data()
@@ -49,9 +51,16 @@ async def answer_for_choosen_day(query: types.CallbackQuery, callback_data : dic
                                 reply_markup=day_keyboard())
     await query.answer()
 
+async def delete_from_group(query: types.CallbackQuery, state: FSMContext):
+    user_data = await state.get_data()
+    delete_user_from_group(query.from_user.id, user_data['chosen_group'])
+    await query.answer('Група успешно удалена', show_alert=True)
+    await query.message.edit_text('Вибери групу', reply_markup=group_keyboard(query.from_user.id))
+
 
 def register_handlers_schedule(dp: Dispatcher):
     dp.register_message_handler(choose_group, text="Розклад занять", state='*')
+    dp.register_callback_query_handler(delete_from_group, text="delete", state=ChooseMajor.save_major)
     dp.register_callback_query_handler(choose_faculty, text="add group", state='*')
     dp.register_callback_query_handler(choose_major, callback_facultys.filter(), state='*')
     dp.register_callback_query_handler(choose_year, callback_majors.filter(), state=ChooseMajor.save_group)

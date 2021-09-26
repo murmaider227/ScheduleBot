@@ -25,3 +25,4 @@ def print_schedule(major, year, day='Понеділок'):
             f"🕓 13:55 − 15:15 \n" 
 
     return data
+
