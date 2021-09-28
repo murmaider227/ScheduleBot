@@ -16,10 +16,12 @@ def group_keyboard(user):
 callback_days = CallbackData("week","day")
 
 def day_keyboard():
-
-    row_2=types.InlineKeyboardButton('Видалити групу', callback_data='delete')
-    row_3= types.InlineKeyboardButton('Настройка', callback_data='setting')
-
+    row_2=[
+        types.InlineKeyboardButton('1 вариант', callback_data="option 1"),
+        types.InlineKeyboardButton('2 вариант', callback_data="option 2")
+        ]
+    row_3=types.InlineKeyboardButton('Видалити групу', callback_data='delete')
+    row_4= types.InlineKeyboardButton('Настройка', callback_data='setting')
     buttons = [
             types.InlineKeyboardButton(text="Пн", callback_data=callback_days.new(day="Понеділок")),
             types.InlineKeyboardButton(text="Вт", callback_data=callback_days.new(day="Вівторок")),
@@ -31,8 +33,9 @@ def day_keyboard():
 
     keyboard = types.InlineKeyboardMarkup(row_width=5)
     keyboard.add(*buttons)
-    keyboard.row(row_2)
+    keyboard.row(*row_2)
     keyboard.row(row_3)
+    keyboard.row(row_4)
     
     return keyboard
 

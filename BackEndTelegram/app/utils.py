@@ -4,8 +4,8 @@ def save_user_group(user, major, year):
     group_id = get_group_id(year, major)
     save_group(user, group_id)
 
-def print_schedule(major, year, day='Понеділок'):
-    text=get_schedule(major, year, day)
+def print_schedule(major, year, day='Понеділок', option='option 1'):
+    text=get_schedule(major, year, day, option[-1])
     data=''
     if text[5]:
         data += f"~~~~~~~~~~~~~ \n 1 {text[5]}\n"\

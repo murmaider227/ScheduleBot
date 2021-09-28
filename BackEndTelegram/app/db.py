@@ -17,11 +17,11 @@ def database(func):
     return wrapper  
 
 @database
-def get_schedule(major, year, day, cursor):
+def get_schedule(major, year, day, option, cursor):
     '''
     Получение расписания по для выбраной пользователем группы
     '''
-    sql='''SELECT sw.id, sm.name, sg.year, sd.name, so.option,
+    sql='''SELECT sw.id, sm.name, sg.year, sd.name, sw.option,
     subject1_name, subject1_teacher, subject1_place,
     subject2_name, subject2_teacher, subject2_place,
     subject3_name, subject3_teacher, subject3_place,
@@ -30,9 +30,9 @@ def get_schedule(major, year, day, cursor):
     JOIN schedule_group sg on sw.group_id=sg.id
     JOIN schedule_major sm on sg.major_id=sm.id
     JOIN schedule_day sd on sw.day_id = sd.id 
-    JOIN schedule_option so on sw.option_id = so.id
-    WHERE sm.name=%s AND sd.name=%s AND sg.year=%s'''
-    cursor.execute(sql, (major,day,year))
+    WHERE sm.name=%s AND sd.name=%s AND sg.year=%s AND sw.option=%s
+    '''
+    cursor.execute(sql, (major,day,year, option))
     text = cursor.fetchall()
     return text[0]
 

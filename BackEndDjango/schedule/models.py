@@ -8,17 +8,10 @@ class Day(models.Model):
         return self.name
 
 
-class Option(models.Model):
-    option = models.IntegerField()
-
-    def __str__(self):
-        return str(self.option)
-
-
 class Week(models.Model):
     group = models.ForeignKey('Group', on_delete=models.CASCADE, null=True)
     day = models.ForeignKey(Day, on_delete=models.CASCADE)
-    option = models.ForeignKey(Option, on_delete=models.CASCADE, verbose_name='Вариант', null=True)
+    option = models.IntegerField(verbose_name='Вариант', null=True)
     subject1_name = models.CharField(max_length=40, blank=True, verbose_name='Первый предмет')
     subject1_teacher = models.CharField(max_length=40, blank=True, verbose_name='Преподаватель')
     subject1_place = models.CharField(max_length=40, blank=True, verbose_name='Кабинет')
