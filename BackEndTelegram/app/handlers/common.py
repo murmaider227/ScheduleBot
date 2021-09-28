@@ -2,13 +2,16 @@ from aiogram import types, Dispatcher
 from aiogram.dispatcher import FSMContext
 
 from app.keyboards import faculty_keyboard
-from app.db import create_user
+from app.db import DataBase
+
+db = DataBase()
+
 
 async def start_cmd(message: types.Message ):
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
     buttons = ["Розклад занять","Час занять"]
     keyboard.add(*buttons)
-    create_user(message.from_user.username, message.from_user.id)
+    db.create_user(message.from_user.username, message.from_user.id)
     await message.answer("Hi", reply_markup=keyboard)
 
 

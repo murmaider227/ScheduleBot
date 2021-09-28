@@ -8,8 +8,10 @@ from aiogram.utils.exceptions import MessageNotModified
 
 from app.utils import print_schedule, save_user_group
 import app.keyboards as keyboard 
-from app.db import delete_user_from_group
+from app.db import DataBase
 
+
+db = DataBase()
 
 class ChooseMajor(StatesGroup):
     save_group = State() # для сохранения групы
@@ -64,7 +66,7 @@ async def change_option(query: types.CallbackQuery, state: FSMContext):
 
 async def delete_from_group(query: types.CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
-    delete_user_from_group(query.from_user.id, user_data['chosen_group'])
+    db.delete_user_from_group(query.from_user.id, user_data['chosen_group'])
     await query.answer('Група успешно удалена', show_alert=True)
     await query.message.edit_text('Вибери групу', reply_markup=keyboard.group_keyboard(query.from_user.id))
 

@@ -3,108 +3,136 @@ import os
 from psycopg2.extras import DictCursor
 
 
-def database(func):
-    def wrapper(*args, **kwargs):
-        conn = psycopg2.connect(dbname=os.getenv('DB_NAME'), user=os.getenv('DB_USERNAME'), password=os.getenv('DB_PASSWORD'), host='localhost')
-        cursor = conn.cursor()
-        conn.autocommit=True
+class DataBase:
 
-        return_value = func(*args, cursor=cursor)
+    def __init__(self):
+        self.conn = None
 
-        cursor.close()
-        conn.close()
-        return return_value
-    return wrapper  
+    def connect(self):
 
-@database
-def get_schedule(major, year, day, option, cursor):
-    '''
-    Получение расписания по для выбраной пользователем группы
-    '''
-    sql='''SELECT sw.id, sm.name, sg.year, sd.name, sw.option,
-    subject1_name, subject1_teacher, subject1_place,
-    subject2_name, subject2_teacher, subject2_place,
-    subject3_name, subject3_teacher, subject3_place,
-    subject4_name, subject4_teacher, subject4_place
-    FROM schedule_week sw
-    JOIN schedule_group sg on sw.group_id=sg.id
-    JOIN schedule_major sm on sg.major_id=sm.id
-    JOIN schedule_day sd on sw.day_id = sd.id 
-    WHERE sm.name=%s AND sd.name=%s AND sg.year=%s AND sw.option=%s
-    '''
-    cursor.execute(sql, (major,day,year, option))
-    text = cursor.fetchall()
-    return text[0]
+        if self.conn is None:
+            try:
+                self.conn = psycopg2.connect(
+                        dbname=os.getenv('DB_NAME'), 
+                        user=os.getenv('DB_USERNAME'), 
+                        password=os.getenv('DB_PASSWORD'), 
+                        host='localhost')
+            except psycopg2.DatabaseError as e:
+                raise e
+            finally:
+                print('Connection opened successfully')
 
-@database
-def create_user(username, telegram_id, cursor):
-    '''
-    Сохранения пользователя при первом использовании бота
-    '''
-    cursor.execute('INSERT INTO schedule_student(username, telegram_id) VALUES (%s, %s) ON CONFLICT DO NOTHING', (username, telegram_id))
+    def get_schedule(self, major, year, day, option):
+        '''
+        Получение расписания по для выбраной пользователем группы
+        '''
+        sql='''SELECT sw.id, sm.name, sg.year, sd.name, sw.option,
+        subject1_name, subject1_teacher, subject1_place,
+        subject2_name, subject2_teacher, subject2_place,
+        subject3_name, subject3_teacher, subject3_place,
+        subject4_name, subject4_teacher, subject4_place
+        FROM schedule_week sw
+        JOIN schedule_group sg on sw.group_id=sg.id
+        JOIN schedule_major sm on sg.major_id=sm.id
+        JOIN schedule_day sd on sw.day_id = sd.id 
+        WHERE sm.name=%s AND sd.name=%s AND sg.year=%s AND sw.option=%s
+        '''
+        self.connect()
+        with self.conn.cursor() as cursor:
+            cursor.execute(sql, (major,day,year, option))
+            text = cursor.fetchall()
+        return text[0]
 
-@database
-def get_faculty(cursor):
-    '''
-    Получение списка факультетов
-    '''
-    cursor.execute('SELECT name FROM schedule_faculty')
-    return cursor.fetchall()
+    def create_user(self, username, telegram_id):
+        '''
+        Сохранения пользователя при первом использовании бота
+        '''
+        sql ='''
+        INSERT INTO schedule_student(username, telegram_id) 
+        VALUES (%s, %s) ON CONFLICT DO NOTHING
+        '''
+        self.connect()
+        with self.conn.cursor() as cursor:
+            cursor.execute(sql, (username, telegram_id))
+            self.conn.commit()
 
-@database
-def get_major(faculty, cursor):
-    '''
-    Получение списка специальностей по заданому факультету
-    '''
-    sql = '''SELECT sm.name 
-    FROM schedule_major sm 
-    JOIN schedule_faculty sf on sm.faculty_id = sf.id 
-    WHERE sf.name = %s'''
-    cursor.execute(sql, (faculty,))
-    return cursor.fetchall()
+    def get_faculty(self):
+        '''
+        Получение списка факультетов
+        '''
+        self.connect()
+        with self.conn.cursor() as cursor:
+            cursor.execute('SELECT name FROM schedule_faculty')
+            text = cursor.fetchall()
+        return text
 
-@database
-def get_group_id(year, major, cursor):
-    '''
-    Получение ид группы по заданной специальности и курсу
-    '''
-    sql = '''
-    SELECT sg.id FROM schedule_group sg
-    JOIN schedule_major sm on sg.major_id=sm.id
-    WHERE sg.year=%s AND sm.name=%s
-    '''
-    cursor.execute(sql, (year, major))
-    return cursor.fetchall()[0]
+    def get_major(self, faculty):
+        '''
+        Получение списка специальностей по заданому факультету
+        '''
+        sql = '''SELECT sm.name 
+        FROM schedule_major sm 
+        JOIN schedule_faculty sf on sm.faculty_id = sf.id 
+        WHERE sf.name = %s'''
+        self.connect()
+        with self.conn.cursor() as cursor:
+            cursor.execute(sql, (faculty,))
+            text = cursor.fetchall()
+        return text
 
-@database
-def save_group(user, group, cursor):
-    '''
-    Сохранение группы пользователя
-    '''
-    sql = '''INSERT INTO schedule_student_major(student_id, group_id) VALUES(%s, %s)'''
-    cursor.execute(sql, (user, group))
+    def get_group_id(self, year, major):
+        '''
+        Получение ид группы по заданной специальности и курсу
+        '''
+        sql = '''
+        SELECT sg.id FROM schedule_group sg
+        JOIN schedule_major sm on sg.major_id=sm.id
+        WHERE sg.year=%s AND sm.name=%s
+        '''
+        self.connect()
+        with self.conn.cursor() as cursor:
+            cursor.execute(sql, (year, major))
+            text = cursor.fetchall()
+        return text[0]
 
-@database
-def get_user_group(user, cursor):
-    '''
-    Получение списка груп пользователя
-    '''
-    sql = '''
-    SELECT sm.name, sg.year, sg.id FROM schedule_group sg
-    JOIN schedule_major sm on sg.major_id=sm.id
-    JOIN schedule_student_major ssm on sg.id = ssm.group_id
-    WHERE ssm.student_id = %s
-    '''
-    cursor.execute(sql, (user,))
-    return cursor.fetchall()
+    def save_group(self, user, group):
+        '''
+        Сохранение группы пользователя
+        '''
+        sql = '''INSERT INTO schedule_student_major(student_id, group_id) 
+        VALUES(%s, %s)'''
+        self.connect()
+        with self.conn.cursor() as cursor:
+            cursor.execute(sql, (user, group))
+            self.conn.commit()
 
-@database
-def delete_user_from_group(user, group, cursor):
-    '''
-    Для удаления групы у пользователя
-    '''
-    sql = '''
-    DELETE FROM schedule_student_major
-    WHERE student_id = %s AND group_id = %s
-    '''
-    cursor.execute(sql, (user, group))
+    def get_user_group(self, user):
+        '''
+        Получение списка груп пользователя
+        '''
+        sql = '''
+        SELECT sm.name, sg.year, sg.id FROM schedule_group sg
+        JOIN schedule_major sm on sg.major_id=sm.id
+        JOIN schedule_student_major ssm on sg.id = ssm.group_id
+        WHERE ssm.student_id = %s
+        '''
+        self.connect()
+        with self.conn.cursor() as cursor:
+            cursor.execute(sql, (user,))
+            text = cursor.fetchall()
+        return text
+
+    def delete_user_from_group(self, user, group):
+        '''
+        Для удаления групы у пользователя
+        '''
+        sql = '''
+        DELETE FROM schedule_student_major
+        WHERE student_id = %s AND group_id = %s
+        '''
+        self.connect()
+        with self.conn.cursor() as cursor:
+            cursor.execute(sql, (user, group))
+            self.conn.commit()
+
+
