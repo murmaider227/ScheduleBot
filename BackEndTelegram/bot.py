@@ -7,6 +7,7 @@ import asyncio
 from app.utils import print_schedule
 from app.handlers.common import register_handlers_common
 from app.handlers.schedule import register_handlers_schedule
+from app.handlers.user_group import register_handlers_user_group
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +24,7 @@ async def main():
 
     register_handlers_common(dp)
     register_handlers_schedule(dp)
+    register_handlers_user_group(dp)
 
     await dp.start_polling(dp)
 
