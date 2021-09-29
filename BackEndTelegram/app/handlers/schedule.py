@@ -31,7 +31,9 @@ async def answer_for_choosen_day(query: types.CallbackQuery, callback_data : dic
                           user_data['chosen_option'])
     with suppress(MessageNotModified):
         await query.message.edit_text(text=text,
-                                reply_markup=keyboard.day_keyboard())
+                                reply_markup=keyboard.day_keyboard(
+                                    callback_data["day"],
+                                    user_data['chosen_option']))
     await query.answer()
 
 async def change_option(query: types.CallbackQuery, state: FSMContext):
@@ -43,7 +45,9 @@ async def change_option(query: types.CallbackQuery, state: FSMContext):
                               user_data["chosen_day"],
                               query.data)
         await query.message.edit_text(text=text,
-                                reply_markup=keyboard.day_keyboard())
+                                reply_markup=keyboard.day_keyboard(
+                                    user_data["chosen_day"],
+                                    query.data))
     else:
         await query.answer()
 

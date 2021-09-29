@@ -1,10 +1,6 @@
-from contextlib import suppress
-
-
 from aiogram import types, Dispatcher
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from aiogram.utils.exceptions import MessageNotModified
 
 from app.utils import print_schedule, save_user_group
 import app.keyboards as keyboard 
@@ -33,23 +29,10 @@ async def choose_year(query: types.CallbackQuery, callback_data: dict, state:FSM
     await query.message.edit_text(text='Вибери рык', reply_markup=keyboard.year_keyboard())
 
 async def user_save_group(query: types.CallbackQuery, callback_data: dict, state: FSMContext):
-    ''' Сохранение групы в бд '''
+    ''' Сохранение групы в бд. '''
     user_data = await state.get_data()
     save_user_group(query.from_user.id, user_data['chosen_major'], callback_data["year"])
     await query.message.edit_text('Успешно')
-
-async def change_option(query: types.CallbackQuery, state: FSMContext):
-    user_data= await state.get_data()
-    if user_data['chosen_option'] != query.data:
-        await state.update_data(chosen_option=query.data)
-        text = print_schedule(user_data['chosen_major'], 
-                              user_data["chosen_year"], 
-                              user_data["chosen_day"], 
-                              query.data)
-        await query.message.edit_text(text=text,
-                                reply_markup=keyboard.day_keyboard())
-    else:
-        await query.answer()
 
 async def delete_from_group(query: types.CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
