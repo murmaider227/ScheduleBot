@@ -11,14 +11,14 @@ def group_keyboard(user):
     groups = db.get_user_group(user)
     buttons = (
             types.InlineKeyboardButton(
-                text=str(item[0]) + str(item[1]), 
+                text=str(item[0]) + ' | Курс: ' + str(item[1]), 
                 callback_data=callback_groups.new(
                     major=item[0],
                     year=item[1],
                     id=item[2]))
                 for item in groups)   
     add = types.InlineKeyboardButton(text="Додати групу", callback_data="add group")
-    keyboard = types.InlineKeyboardMarkup()
+    keyboard = types.InlineKeyboardMarkup(row_width=1)
     keyboard.add(*buttons)
     keyboard.row(add)
     return keyboard
@@ -40,8 +40,8 @@ def day_keyboard(day='Понеділок', option='option 1'):
             text='Видалити групу',
             callback_data='delete')
     row_4= types.InlineKeyboardButton(
-            text='Настройка',
-            callback_data='setting')
+            text='<<',
+            callback_data='back')
     days={'Понеділок':'Пн','Вівторок':'Вт','Середа':'Ср',
           'Четвер':'Чт','Пятниця':'Пт'}
     days[day] = '➡️ ' + days[day]

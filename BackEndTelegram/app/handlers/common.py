@@ -12,7 +12,7 @@ async def start_cmd(message: types.Message ):
     buttons = ["Розклад занять","Час занять"]
     keyboard.add(*buttons)
     db.create_user(message.from_user.username, message.from_user.id)
-    await message.answer("Hi", reply_markup=keyboard)
+    await message.answer("Виберiть кнопку з клавiатури", reply_markup=keyboard)
 
 
 def register_handlers_common(dp: Dispatcher):
