@@ -8,7 +8,7 @@ class DataBase:
         self.conn = None
 
     def connect(self):
-        """Проверка/создание подключения к дб."""
+        """Connect to database."""
         if self.conn is None:
             try:
                 self.conn = psycopg2.connect(
@@ -21,8 +21,8 @@ class DataBase:
             finally:
                 print('Connection opened successfully')
 
-    def get_schedule(self, major, year, day, option):
-        """Получение расписания для выбраной пользователем группы."""
+    def get_schedule(self, major: str, year: int, day: str, option: str):
+        """Get schedule for selected group."""
         sql='''SELECT sw.id, sm.name, sg.year, sd.name, sw.option,
         subject1_name, subject1_teacher, subject1_place,
         subject2_name, subject2_teacher, subject2_place,
@@ -40,8 +40,8 @@ class DataBase:
             text = cursor.fetchall()
         return text[0]
 
-    def create_user(self, username, telegram_id):
-        """Сохранения пользователя при первом использовании бота."""
+    def create_user(self, username: str, telegram_id: int) -> None:
+        """Saving user after first use of bot."""
         sql ='''
         INSERT INTO schedule_student(username, telegram_id) 
         VALUES (%s, %s) ON CONFLICT DO NOTHING
@@ -51,16 +51,16 @@ class DataBase:
             cursor.execute(sql, (username, telegram_id))
             self.conn.commit()
 
-    def get_faculty(self):
-        """Получение списка факультетов."""
+    def get_faculty(self) -> list:
+        """Get list of faculty."""
         self.connect()
         with self.conn.cursor() as cursor:
             cursor.execute('SELECT name FROM schedule_faculty')
             text = cursor.fetchall()
         return text
 
-    def get_major(self, faculty):
-        """Получение списка специальностей по заданому факультету."""
+    def get_major(self, faculty: str) -> list:
+        """Get major by faculty."""
         sql = '''SELECT sm.name 
         FROM schedule_major sm 
         JOIN schedule_faculty sf on sm.faculty_id = sf.id 
@@ -71,8 +71,8 @@ class DataBase:
             text = cursor.fetchall()
         return text
 
-    def get_group_id(self, year, major):
-        """Получение ид группы по заданной специальности и курсу."""
+    def get_group_id(self, year: int, major: str) -> int:
+        """Get group id by year and major."""
         sql = '''
         SELECT sg.id FROM schedule_group sg
         JOIN schedule_major sm on sg.major_id=sm.id
@@ -84,8 +84,8 @@ class DataBase:
             text = cursor.fetchall()
         return text[0]
 
-    def save_group(self, user, group):
-        """Сохранение группы пользователя."""
+    def save_group(self, user: int, group: int) -> None:
+        """Saving user group."""
         sql = '''INSERT INTO schedule_student_major(student_id, group_id) 
         VALUES(%s, %s)'''
         self.connect()
@@ -93,8 +93,8 @@ class DataBase:
             cursor.execute(sql, (user, group))
             self.conn.commit()
 
-    def get_user_group(self, user):
-        """Получение списка груп пользователя."""
+    def get_user_group(self, user: int) -> list:
+        """Get list of user groups."""
         sql = '''
         SELECT sm.name, sg.year, sg.id FROM schedule_group sg
         JOIN schedule_major sm on sg.major_id=sm.id
@@ -107,8 +107,8 @@ class DataBase:
             text = cursor.fetchall()
         return text
 
-    def delete_user_from_group(self, user, group):
-        """Для удаления групы у пользователя."""
+    def delete_user_from_group(self, user: int, group: int) -> None:
+        """Delete selected user group."""
         sql = '''
         DELETE FROM schedule_student_major
         WHERE student_id = %s AND group_id = %s

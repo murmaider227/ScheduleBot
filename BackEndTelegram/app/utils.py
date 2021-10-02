@@ -3,12 +3,16 @@ from app.db import DataBase
 db = DataBase()
 
 
-def save_user_group(user, major, year):
+def save_user_group(user, major: str, year: int) -> None:
     group_id = db.get_group_id(year, major)
     db.save_group(user, group_id)
 
-def print_schedule(major, year, day='Понеділок', option='option 1'):
-    text=db.get_schedule(major, year, day, option[-1])
+def print_schedule(major: str, year: int, day='Понеділок', option='option 1') -> str:
+    """Generate schedule by given major, year, day and option. """
+    try:
+        text=db.get_schedule(major, year, day, option[-1])
+    except IndexError:
+        return 'В данных день пар нету'
     data=''
     if text[5]:
         data += f"~~~~~~~~~~~~~ \n 1 {text[5]}\n"\
